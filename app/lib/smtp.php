@@ -3,10 +3,14 @@
  * Klien SMTP mentah — keputusan Bang Rob (12 Okt 2026), AMENDMEN PRD Bab 10.4:
  * menggantikan PHPMailer. Zero-dep, satu dialog, semua baris bisa ditrace.
  *
- * Dialog (Gmail, port 465 implicit TLS):
- *   connect tls -> 220 -> EHLO -> 250 -> AUTH LOGIN -> 334 -> user -> 334
- *   -> pass -> 235 -> MAIL FROM -> 250 -> RCPT TO -> 250 -> DATA -> 354
- *   -> pesan + "." -> 250 -> QUIT
+ * Dua mode koneksi (port menentukan):
+ * - 465: implicit TLS — TLS duluan, baru sapa server
+ *   connect tls -> 220 -> EHLO -> 250 -> AUTH LOGIN -> ...
+ * - 587: STARTTLS — sapa server polos, naikkan TLS, sapa ulang, baru AUTH
+ *   connect -> 220 -> EHLO -> 250 -> STARTTLS -> 220 -> EHLO -> 250 -> AUTH LOGIN -> ...
+ *
+ * Alasan dua mode: shared hosting (Hostinger) sering blokir port 465 keluar,
+ * tapi 587 hampir selalu terbuka. Port diatur lewat config SMTP_PORT.
  *
  * TLS/kripto ditangani PHP streams (OpenSSL) — file ini cuma menulis teks
  * protokol SMTP, bukan ngurus enkripsi.
@@ -75,7 +79,7 @@ function smtp_encode_header(string $text): string
  * Kirim 1 email teks lewat SMTP dengan TLS.
  *
  * @param string $host SMTP host (mis. smtp.gmail.com)
- * @param int    $port 465 = implicit TLS Gmail
+ * @param int    $port 465 = implicit TLS | 587 = STARTTLS
  * @param string $user kredensial AUTH — Gmail: email + App Password
  * @param string $pass App Password
  * @param string $from pengirim — WAJIB sama dengan $user biar lolos DMARC Gmail
@@ -93,7 +97,11 @@ function smtp_send(
     string $subject,
     string $body
 ): void {
-    $remote = 'tls://' . $host . ':' . $port;
+    // Port 465 bungkus TLS dari awal (implicit). Port lain konek polos dulu,
+    // lalu naikkan lewat STARTTLS setelah EHLO.
+    $implicitTls = ($port === 465);
+    $remote = $implicitTls ? "tls://{$host}:{$port}" : "tcp://{$host}:{$port}";
+
     $fp = @stream_socket_client($remote, $errno, $errstr, 15, STREAM_CLIENT_CONNECT);
     if ($fp === false) {
         throw new RuntimeException("SMTP: gagal terhubung ke {$remote} — {$errstr} ({$errno})");
@@ -103,6 +111,22 @@ function smtp_send(
     try {
         smtp_expect($fp, 220);                                   // sapaan server
         smtp_cmd($fp, 'EHLO ' . (gethostname() ?: 'localhost'), 250);
+
+        if (!$implicitTls) {
+            // STARTTLS: naikkan kanal ke TLS, lalu EHLO ulang (wajib oleh RFC 3207 —
+            // kapabilitas setelah TLS bisa beda, mis. AUTH baru muncul di sini).
+            smtp_cmd($fp, 'STARTTLS', 220);
+            $ok = @stream_socket_enable_crypto(
+                $fp,
+                true,
+                STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT
+            );
+            if ($ok !== true) {
+                throw new RuntimeException('SMTP: gagal menaikkan koneksi ke TLS (STARTTLS).');
+            }
+            smtp_cmd($fp, 'EHLO ' . (gethostname() ?: 'localhost'), 250);
+        }
+
         smtp_cmd($fp, 'AUTH LOGIN', 334);
         smtp_cmd($fp, base64_encode($user), 334);
         smtp_cmd($fp, base64_encode($pass), 235);

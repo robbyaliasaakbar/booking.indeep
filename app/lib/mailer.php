@@ -73,9 +73,15 @@ function mailer_send_otp(string $email, string $code, string $purpose): void
         "Salam,\n" .
         "InDeepCleaningID\n";
 
+    // Port SMTP dari config (default 587 STARTTLS). 465 implicit TLS juga
+    // didukung smtp_send() — ganti lewat SMTP_PORT kalau hosting mengizinkan.
+    // 587 dipilih sebagai default karena shared hosting (Hostinger) sering
+    // memblokir 465 keluar, sementara 587 hampir selalu terbuka.
+    $smtpPort = (int) config('SMTP_PORT', 587);
+
     smtp_send(
         $smtpHost,
-        465,                         // Gmail implicit TLS
+        $smtpPort,
         (string) config('SMTP_USER'),
         (string) config('SMTP_PASS'),
         (string) config('SMTP_USER'), // From = user pengirim (DMARC Gmail wajib sama)

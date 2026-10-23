@@ -33,8 +33,10 @@ return [
     // Produksi (keputusan Bang Rob): Gmail App Password.
     //   SMTP_HOST = 'smtp.gmail.com' | SMTP_USER = email Gmail | SMTP_PASS = App Password 16 karakter
     // (Butuh 2-Step Verification aktif dulu di akun Google.)
+    // SMTP_PORT: 587 = STARTTLS (default, aman di shared hosting) | 465 = implicit TLS
     // Lokal: kosongkan semua -> kode OTP ditulis ke storage/otp-dev.log.
     'SMTP_HOST' => '',
+    'SMTP_PORT' => 587,
     'SMTP_USER' => '',
     'SMTP_PASS' => '',
 

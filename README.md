@@ -112,7 +112,7 @@ satu dashboard admin yang jujur · local dev nyala dengan satu perintah.
 | Backend | **PHP 8.3, nol dependensi** (tanpa Composer, tanpa framework) | Tiap baris bisa ditrace di shared hosting; gak ada `composer install` saat deploy. Filosofi sama kayak auth backend EXP011 |
 | Database | **MariaDB 11** lokal (Docker), **MySQL InnoDB** di Hostinger | Kunci baris InnoDB + transaksi bikin booking slot anti-bentrok |
 | Session | Session PHP native (`HttpOnly` + `SameSite`) | Gak ribet JWT; pencabutan dari server cukup hapus baris |
-| Email (OTP) | **Klien SMTP mentah** `app/lib/smtp.php` — Gmail, TLS implisit :465, App Password | Menggantikan PHPMailer sesuai amendmen PRD 10.4: satu provider, zero dep, tiap dialog bisa ditrace |
+| Email (OTP) | **Klien SMTP mentah** `app/lib/smtp.php` — Gmail, App Password, port dari config (`SMTP_PORT`, default `587` STARTTLS; `465` implicit TLS juga didukung) | Menggantikan PHPMailer sesuai amendmen PRD 10.4: satu provider, zero dep, tiap dialog bisa ditrace. 587 dipakai karena Hostinger memblokir 465 keluar |
 | Login Google | Alur OAuth 2.0 mentah dengan `state` acak di session | Aturan zero-dep yang sama |
 | Validasi | PHP di server (percaya browser = bahaya) + guard ramah di FE | Defense in depth |
 | Test | Skrip Node polos yang nembak API + skrip headless-Chrome CDP buat UI | Tanpa framework test; jalan di mana aja |
