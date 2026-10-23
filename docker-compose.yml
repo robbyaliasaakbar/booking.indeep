@@ -1,0 +1,46 @@
+# Docker lokal App InDeep Booking (keputusan Bang Rob: Docker PHP + Docker MariaDB)
+# - db   : MariaDB (kompatibel MySQL InnoDB, sesuai PRD Bab 15)
+# - php  : server PHP built-in, port 5011 (port 8000 dipakai app lain)
+#
+# Perintah:
+#   docker compose up -d        -> nyalain db + php
+#   docker compose up php       -> dipanggil oleh npm run dev:api
+#   docker compose run --rm php php scripts/seed.php  -> seed (Batch 5)
+
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: localroot
+      MARIADB_DATABASE: indeep_booking
+      MARIADB_USER: indeep
+      MARIADB_PASSWORD: indeep_local
+      # WIB — NOW() dan DEFAULT CURRENT_TIMESTAMP harus sama dengan PHP (PRD Bab 15)
+      TZ: Asia/Jakarta
+    # utf8mb4 wajib sesuai PRD Bab 15
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  php:
+    build: .
+    ports:
+      - "5011:5011"
+    volumes:
+      # Code di-mount live: edit file, refresh browser, langsung kebaca
+      - .:/app
+    working_dir: /app
+    command: php -S 0.0.0.0:5011 -t public
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  dbdata:

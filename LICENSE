@@ -1,0 +1,64 @@
+PROPRIETARY SOFTWARE LICENSE — SOURCE AVAILABLE FOR INSPECTION
+App InDeep Booking — InDeepCleaningID
+
+Copyright (c) 2026 Robby. All rights reserved.
+
+-------------------------------------------------------------------------------
+1. DEFINITION
+-------------------------------------------------------------------------------
+"This Software" means all files in this repository: source code, built
+assets, documentation, configuration templates, images, and any associated
+files. "Repository" means the codebase hosted at
+github.com/indeepcleaningid/indeep-booking.
+
+-------------------------------------------------------------------------------
+2. NATURE OF THIS RELEASE
+-------------------------------------------------------------------------------
+This Repository is published for inspection, review, and portfolio purposes.
+It is NOT open-source: the Software remains the exclusive proprietary property
+of the copyright holder. Public visibility of the code grants no rights beyond
+viewing and referencing it (for example: code review, interviews, and technical
+due diligence).
+
+-------------------------------------------------------------------------------
+3. GRANT OF LICENSE
+-------------------------------------------------------------------------------
+Permission is hereby granted, free of charge, to the copyright holder and
+to persons explicitly authorized in writing by the copyright holder, to
+use, copy, modify, and manage this Software for the internal business purposes
+of InDeepCleaningID and its associated projects.
+
+-------------------------------------------------------------------------------
+4. RESTRICTIONS
+-------------------------------------------------------------------------------
+The Software is the exclusive property of the copyright holder. Except as
+expressly permitted in writing by the copyright holder, you MAY NOT:
+
+  a. copy, reproduce, or redistribute the Software, in whole or in part,
+     outside the inspection purposes stated in Section 2;
+  b. sublicense, sell, or otherwise exploit the Software or any part of it;
+  c. create and publish derivative works from the Software;
+  d. remove or alter any copyright, proprietary, or license notices;
+  e. use the Software, its structure, or its business rules to operate a
+     competing commercial service.
+
+Referencing small snippets with attribution (for example in a technical
+article or interview discussion) is acceptable. Wholesale reuse is not.
+
+-------------------------------------------------------------------------------
+5. NO WARRANTY
+-------------------------------------------------------------------------------
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
+WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF
+OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+-------------------------------------------------------------------------------
+6. TERMINATION
+-------------------------------------------------------------------------------
+This license terminates automatically if you breach any of its terms.
+Upon termination you must destroy all copies of the Software in your
+possession.

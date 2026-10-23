@@ -1,0 +1,36 @@
+# === RAHASIA — jangan pernah ke-commit/push ===
+# Credential & rencana bisnis (permintaan eksplisit Bang Rob, 12 Okt 2026)
+Credential+plan/
+
+# Secret & config asli (PRD Bab 14.3: file asli jangan dicommit)
+config/config.php
+web/.env
+web/.env.local
+web/.env.*.local
+web/.env.development
+
+# Hasil build frontend
+web/dist/
+
+# Dependencies
+node_modules/
+
+# Data user & file upload (PRD Bab 10.3)
+public/uploads/*
+!public/uploads/index.php
+
+# Log, file OTP lokal, & OS
+*.log
+storage/otp-dev.log
+.DS_Store
+
+# File uji struk PDF
+web/struk-*.pdf
+
+# Dump database — isinya hash password admin & data asli. Jangan pernah ke-push.
+booking.sql
+
+# File Development (catatan kerja lokal, tidak dipakai aplikasi)
+issue.md
+chat.md
+

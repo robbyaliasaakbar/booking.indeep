@@ -1,0 +1,51 @@
+# .htaccess — App InDeep Booking (untuk Apache shared hosting / Hostinger)
+# PHP built-in server (dev lokal) TIDAK membaca file ini — ini khusus produksi.
+
+# --- Security headers (PRD Bab 18) ---
+<IfModule mod_headers.c>
+    # HSTS (issue #28): paksa HTTPS 1 tahun termasuk subdomain. Tanpa `preload`
+    # dulu — tunggu semua subdomain di domain ini siap HTTPS sepenuhnya.
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+# --- Jangan sajikan file tersembunyi / file sensitif ---
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+<FilesMatch "\.(env|log|sqlite|db|sql|md)$">
+    Require all denied
+</FilesMatch>
+
+# --- Block akses ke folder non-publik kalau document root salah set ---
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Kalau ada folder app/ atau config/ ke-salin ke public_html, block total
+    RewriteRule ^(app|config|scripts|storage|tests)/ - [F,L]
+
+    # Backdoor login-dev ditutup total di produksi (issue #27). Gate di dalam
+    # PHP-nya sendiri berbasis config yang bisa salah ketik — gate web server
+    # ini gak baca config sama sekali. Dev lokal aman: php -S tidak membaca
+    # file .htaccess, jadi suite uji tetap jalan.
+    RewriteRule ^api/login-dev\.php$ - [F,L]
+
+    # --- SPA fallback React Router (Hostinger: booking.indeepcleaningid.site) ---
+    # Request ke file yang gak ada (mis. /pricelist) → index.html,
+    # biar routing React yang ambil alih. API, uploads, & file asli (css/js/gambar)
+    # tetap dilayani apa adanya.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_URI} !/api/
+    RewriteCond %{REQUEST_URI} !/uploads/
+    RewriteCond %{REQUEST_URI} !\.(css|js|map|json|webp|png|jpg|jpeg|svg|ico|woff2?|txt)$ [NC]
+    RewriteRule ^ index.html [L]
+</IfModule>
+
+# --- PHP settings ringan (diabaikan kalau shared hosting tidak izinkan) ---
+<IfModule mod_php.c>
+    php_value upload_max_filesize 3M
+    php_value post_max_size 4M
+    php_value max_execution_time 30
+</IfModule>

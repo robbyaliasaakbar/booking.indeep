@@ -1,0 +1,57 @@
+# CI App InDeep Booking — jalan tiap Pull Request.
+# Aturan: main = auto-deploy live Hostinger, jadi semua perubahan lewat PR
+# yang dicek di sini dulu, baru Bang Rob review dan merge (CONTRIBUTING.md).
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  php-lint:
+    name: php -l (PHP 8.3)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      # Lint SEMUA file PHP: public/api, app/lib, app/models, scripts
+      - name: PHP syntax check
+        run: find public app scripts -name '*.php' -print0 | xargs -0 -n1 -I{} php -l {}
+
+  frontend-build:
+    name: Vite build + bundle sync check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: web
+
+      # Env HARUS sama dengan build lokal (README bagian Deploy) supaya
+      # bundle identik — lihat step verifikasi di bawah.
+      # Produksi = subdomain booking.indeepcleaningid.site, jadi base '/'.
+      # JANGAN isi VITE_BASE_PATH / VITE_BASENAME (itu sisa era sub-path
+      # /app-booking/ yang sudah mati).
+      - name: Build
+        run: npm run build
+        working-directory: web
+        env:
+          VITE_WA_ADMIN: '6287748244464'
+
+      # Menangkap "lupa rebuild": kalo source web/ berubah tapi public/
+      # (yang ikut ke-commit dan jadi yang ter-deploy) belum di-build ulang,
+      # diff ini merah.
+      - name: Verifikasi bundle di public/ sesuai source
+        run: git diff --exit-code -- public/index.html public/assets

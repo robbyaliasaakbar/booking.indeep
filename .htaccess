@@ -1,0 +1,42 @@
+# .htaccess — App InDeep Booking (repo root = public_html/booking, subdomain booking.indeepcleaningid.site)
+# URL subdomain booking.indeepcleaningid.site menunjuk ke folder INI, padahal web sebenarnya ada di public/
+# (layout sama persis dgn lokal: app/ config/ public/ scripts/ web/).
+# Tugas file ini cuma 2: (1) blok isi repo dari publik, (2) arahkan request ke public/.
+# PHP TIDAK disentuh — semua require path di kode tetap berlaku apa adanya.
+
+RewriteEngine On
+
+# [0] Blok folder & file internal repo — termasuk .git, seed, log OTP, dan rahasia
+RewriteRule ^(app|config|scripts|storage|web|node_modules|Credential\+plan)(/|$) - [F,L]
+RewriteRule ^\.git(/|$) - [F,L]
+RewriteRule ^(\.env.*|\.gitignore|\.dockerignore|Dockerfile|docker-compose\.yml|package(-lock)?\.json)$ - [F,L]
+# Ekstensi sensitif — issue #1. FilesMatch extension gak nendang di Hostinger
+# (LiteSpeed/CDN), tapi mod_rewrite KEBUKTI jalan (app/ config/ scripts/ → 403).
+# Ini proteksi dobel buat file *.md/*.sql/*.log/*.db/*.env/*.bak/*.old/*.swp yang
+# tak sengaja ter-upload (mis. seluruh repo lewat File Manager) — minta 403.
+RewriteRule \.(md|sql|db|log|env|bak|old|swp)$ - [F,L]
+# Nama file repo tanpa ekstensi — follow-up issue #1. Rule ekstensi di atas
+# lolos buat LICENSE/README/SECURITY tanpa .md (kebukti masih 200 OK pas
+# validasi PR #60). Anchoring ^...$ biar cuma kena nama file exact, bukan
+# jalur API/upload (gak ada route /LICENSE, /Dockerfile, dsb. di app ini).
+RewriteRule ^(LICENSE|README|SECURITY|NOTICE|CHANGELOG|Makefile|Dockerfile)(\.(md|txt))?$ - [F,L,NC]
+# Pintu seed pernah di-commit di root sekali buat auto-deploy — diblokir permanen
+# biar kalau ada yang upload ulang lewat File Manager, gak bisa dijalanin sembarangan.
+RewriteRule ^seed-web\.php$ - [F,L]
+# Backdoor login-dev juga diblokir permanen di sini (issue #27) — proteksi dobel
+# sama kaya seed-web: file tetap ada di repo buat dev lokal, tapi gak boleh
+# pernah bisa dijalankan lewat web di produksi.
+RewriteRule ^(public/)?api/login-dev\.php$ - [F,L]
+
+# [1] URL root polos (/) → index.html React
+RewriteRule ^$ public/index.html [L]
+
+# [2] Request biasa yang belum kena prefix → arahkan ke public/
+#     (api/, uploads/, brand/, assets/, index.html, robots.txt semuanya ada di sana).
+#     Subject yang sudah diawali public/ dibiarkan — biar gak jadi public/public/...
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(?!public/)(.*)$ public/$1 [L]
+
+# [3] Route React yang gak ketemu file → biar public/.htaccess yang tangani
+#     (SPA fallback ke index.html + security header; /api & /uploads yang gak ada → 404 jujur)

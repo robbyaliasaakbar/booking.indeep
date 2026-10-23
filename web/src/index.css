@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+/*
+ * Tema resmi neobrutalism rounded (PRD Bab 13).
+ * Border hitam 2px, radius 16-20, shadow solid offset tanpa blur.
+ */
+
+@theme {
+  /* Warna senada logo InDeepCleaningID (diambil dari Logo.webp:
+     navy #062B3D + emas #F4BF1F + hitam) — PRD Bab 13 disesuaikan owner */
+  --color-paper: #fffdf5; /* krem kertas */
+  --color-brand: #062b3d; /* navy gelap — warna brand utama logo */
+  --color-cta: #f4bf1f; /* kuning emas — aksen logo, tombol Pesan */
+  --color-success: #bbf7d0; /* hijau pastel */
+  --color-warning: #fde68a; /* amber */
+  --color-danger: #fecaca; /* merah pastel */
+  --color-ink: #000000; /* hitam pekat, sama dengan basis logo */
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+  /* Radius */
+  --radius-card: 18px; /* kartu 16-20 sesuai PRD */
+  --radius-btn: 14px; /* tombol */
+
+  /* Shadow solid offset tanpa blur */
+  --shadow-brutal: 4px 4px 0 0 #000000;
+  --shadow-brutal-blue: 4px 4px 0 0 #062b3d;
+  --shadow-brutal-sm: 3px 3px 0 0 #000000;
+}
+
+@layer components {
+  /* Kartu: border hitam 2px, radius 18, shadow solid (PRD Bab 13) */
+  .card {
+    @apply rounded-card border-2 border-ink bg-white shadow-brutal;
+  }
+
+  /* Tombol gemuk: tebal, radius 14, border hitam, shadow solid */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-btn border-2 border-ink px-4 py-2.5 text-sm font-extrabold shadow-brutal-sm transition;
+  }
+
+  /* CTA utama: kuning emas, teks navy, rasa pencet saat hover */
+  .btn-cta {
+    @apply bg-cta text-brand hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_0_#000000];
+  }
+
+  .btn-ghost {
+    @apply bg-white text-brand hover:bg-paper;
+  }
+
+  /* Rasa pencet: geser 1px + shadow menyusut — sama seperti .btn-cta */
+  .btn-press {
+    @apply hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_0_#000000];
+  }
+
+  /* Input baku neobrutalism: border hitam 2px, radius xl, konsisten antar halaman */
+  .input-brutal {
+    @apply w-full rounded-xl border-2 border-ink px-3 py-2 focus-visible:outline-none;
+  }
+}
+
+:root {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  color: #000000;
+  background-color: #fffdf5;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Anchor halus, tapi hormati preferensi user kurangi animasi */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Focus ring jelas buat keyboard navigability (PRD Bab 18) */
+:focus-visible {
+  outline: 3px solid #062b3d;
+  outline-offset: 2px;
+}

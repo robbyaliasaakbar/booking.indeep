@@ -1,0 +1,13 @@
+# robots.txt — App InDeep Booking (InDeepCleaningID)
+# Produksi: subdomain booking.indeepcleaningid.site (docroot = root app, base '/').
+# Path di bawah relatif terhadap subdomain ini, bukan domain utama.
+User-agent: *
+Allow: /
+
+# Jangan indeks area login & API
+Disallow: /login
+Disallow: /lupa-password
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://booking.indeepcleaningid.site/sitemap.xml

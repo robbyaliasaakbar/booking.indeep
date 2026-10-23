@@ -1,0 +1,7 @@
+# Folder yang gak usah dikirim ke Docker build context (biar build cepet)
+node_modules
+web/node_modules
+web/dist
+.git
+Credential+plan
+*.log
