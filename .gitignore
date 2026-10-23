@@ -4,6 +4,8 @@ Credential+plan/
 
 # Secret & config asli (PRD Bab 14.3: file asli jangan dicommit)
 config/config.php
+config/config.production.php
+config/config.local.php
 web/.env
 web/.env.local
 web/.env.*.local
